@@ -9,6 +9,8 @@ Display an overview of the users inventory (requires the C.O.R.E. subscription t
 
 ![Inventory overview](https://github.com/Guschtel/public-iitc-scripts/blob/main/images/inventory-overview/overview_0.png?raw=true)
 
+![Inventory overview](https://github.com/Guschtel/public-iitc-scripts/blob/main/images/inventory-overview/overview_2.png?raw=true)
+
 Hovering the legend hightlights the item type in the chart:
 
 ![Inventory overview highlight](https://github.com/Guschtel/public-iitc-scripts/blob/main/images/inventory-overview/overview_1.png?raw=true)
