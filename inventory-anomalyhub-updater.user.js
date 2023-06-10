@@ -4,7 +4,7 @@
 // @description  Update inventory script
 // @author       Guschtel
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @match        https://register.athens.willbe.blue/inventory/update
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=willbe.blue
 // @grant        none
@@ -73,7 +73,7 @@ function getOtherBeacons(inventory) {
                 document.getElementsByName("inventory[VRMH]")[0].value = to_number(inventory["Multi-Hack VERY_RARE"]);
                 document.getElementsByName("inventory[SBUL]")[0].value = to_number(inventory["Ultra-Link"]);
                 var utc = new Date().toJSON();
-                document.getElementsByName("inventory[_notes]")[0].value += "\nInventory automatically filled with Guschtels userscript (https://iitc.willbe.blue/userscript/view?id=142) on " + utc;
+                document.getElementsByName("inventory[_notes]")[0].value += "\nInventory automatically filled with Guschtels Inventory userscripts (https://github.com/Guschtel/public-iitc-scripts/tree/main) on " + utc;
             } else {
                 console.error('Invalid clipboard content');
             }
