@@ -4,7 +4,7 @@
 // @description  Update inventory script
 // @author       Guschtel
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @match        https://register.athens.willbe.blue/inventory/update
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=willbe.blue
 // @grant        none
@@ -73,7 +73,13 @@ function getOtherBeacons(inventory) {
                 document.getElementsByName("inventory[VRMH]")[0].value = to_number(inventory["Multi-Hack VERY_RARE"]);
                 document.getElementsByName("inventory[SBUL]")[0].value = to_number(inventory["Ultra-Link"]);
                 var utc = new Date().toJSON();
-                document.getElementsByName("inventory[_notes]")[0].value += "\nInventory automatically filled with Guschtels Inventory userscripts (https://github.com/Guschtel/public-iitc-scripts/tree/main) on " + utc;
+                var commentElement = document.getElementsByName("inventory[_notes]")[0];
+                if (!commentElement.value.includes("Inventory automatically filled with Guschtels Inventory userscripts")) {
+                    commentElement.value += "\nInventory automatically filled with Guschtels Inventory userscripts (https://github.com/Guschtel/public-iitc-scripts/tree/main) on " + utc;
+                } else {
+                    const regex = /on [0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.*Z/i;
+                    commentElement.value = commentElement.value.replace(regex, 'on ' + utc);
+                }
             } else {
                 console.error('Invalid clipboard content');
             }
