@@ -4,8 +4,8 @@
 // @description  Update inventory script
 // @author       Guschtel
 // @namespace    http://tampermonkey.net/
-// @version      0.4
-// @match        https://register.athens.willbe.blue/inventory/update
+// @version      0.5
+// @match        https://*.willbe.blue/inventory/update
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=willbe.blue
 // @grant        none
 // ==/UserScript==
