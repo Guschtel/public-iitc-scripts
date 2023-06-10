@@ -4,7 +4,7 @@
 // @description  Update inventory script
 // @author       Guschtel
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @match        https://*.willbe.blue/inventory/update
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=willbe.blue
 // @grant        none
@@ -14,7 +14,7 @@ function to_number(val) {
     if (val == null || val == undefined) {
         return 0;
     }
-    return val;
+    return +(val.toString().replace(/\r/g, ''));
 }
 
 function getOtherBeacons(inventory) {
