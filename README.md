@@ -72,3 +72,5 @@ XMP 8	COMMON	9999
 ```
 
 On Anomalyhub, if you visit the /inventory/update link a new button should appear: "Copy from clipboard", use it to fill the inventory fields, then click "Update" to submit the data.
+
+![Update Inventory View](https://github.com/Guschtel/public-iitc-scripts/blob/main/images/images/inventory-anomalyhub-updater/athens-anomaly-update.png?raw=true)
