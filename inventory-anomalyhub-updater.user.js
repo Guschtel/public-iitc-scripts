@@ -4,7 +4,7 @@
 // @description  Update inventory script
 // @author       Guschtel
 // @namespace    http://tampermonkey.net/
-// @version      0.6
+// @version      0.7
 // @match        https://*.willbe.blue/inventory/update
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=willbe.blue
 // @grant        none
@@ -25,6 +25,13 @@ function getOtherBeacons(inventory) {
         }
     }
     return sum;
+}
+
+function setFormValue(formKey, formValue) {
+    const elements = document.getElementsByName(formKey);
+    if (elements != undefined && elements.length > 0) {
+        elements[0].value = formValue;
+    }
 }
 
 (function() {
@@ -55,23 +62,27 @@ function getOtherBeacons(inventory) {
                 }
                 console.log('Inventory: ', inventory);
 
-                document.getElementsByName("inventory[X8]")[0].value = to_number(inventory["XMP 8"]);
-                document.getElementsByName("inventory[U8]")[0].value = to_number(inventory["US 8"]);
-                document.getElementsByName("inventory[JARVIS]")[0].value = to_number(inventory["Virus JARVIS"]);
-                document.getElementsByName("inventory[ADA]")[0].value = to_number(inventory["Virus ADA"]);
-                document.getElementsByName("inventory[R8]")[0].value = to_number(inventory["Resonator 8"]);
-                document.getElementsByName("inventory[R7]")[0].value = to_number(inventory["Resonator 7"]);
-                document.getElementsByName("inventory[R6]")[0].value = to_number(inventory["Resonator 6"]);
-                document.getElementsByName("inventory[R5]")[0].value = to_number(inventory["Resonator 5"]);
-                document.getElementsByName("inventory[R4]")[0].value = to_number(inventory["Resonator 4"]);
-                document.getElementsByName("inventory[Aegis]")[0].value = to_number(inventory["Aegis Shield"]);
-                document.getElementsByName("inventory[VR Shields]")[0].value = to_number(inventory["Shield VERY_RARE"]);
-                document.getElementsByName("inventory[Hypercubes]")[0].value = to_number(inventory["Hypercube"]);
-                document.getElementsByName("inventory[VR Battle Beacons]")[0].value = to_number(inventory["Powerup BB_BATTLE"]);
-                document.getElementsByName("inventory[Other Beacons]")[0].value = to_number(getOtherBeacons(inventory));
-                document.getElementsByName("inventory[VRHS]")[0].value = to_number(inventory["HS VERY_RARE"]);
-                document.getElementsByName("inventory[VRMH]")[0].value = to_number(inventory["Multi-Hack VERY_RARE"]);
-                document.getElementsByName("inventory[SBUL]")[0].value = to_number(inventory["Ultra-Link"]);
+                setFormValue("inventory[X8]", to_number(inventory["XMP 8"]));
+                setFormValue("inventory[U8]", to_number(inventory["US 8"]));
+                setFormValue("inventory[JARVIS]", to_number(inventory["Virus JARVIS"]));
+                setFormValue("inventory[ADA]", to_number(inventory["Virus ADA"]));
+                setFormValue("inventory[R8]", to_number(inventory["Resonator 8"]));
+                setFormValue("inventory[R7]", to_number(inventory["Resonator 7"]));
+                setFormValue("inventory[R6]", to_number(inventory["Resonator 6"]));
+                setFormValue("inventory[R5]", to_number(inventory["Resonator 5"]));
+                setFormValue("inventory[R4]", to_number(inventory["Resonator 4"]));
+                setFormValue("inventory[Aegis]", to_number(inventory["Aegis Shield"]));
+                setFormValue("inventory[VR Shields]", to_number(inventory["Shield VERY_RARE"]));
+                setFormValue("inventory[C8]", to_number(inventory["PC 8"]));
+                setFormValue("inventory[Hypercubes]", to_number(inventory["Hypercube"]));
+                setFormValue("inventory[LPC]", to_number(inventory["Hypercube"]));
+                setFormValue("inventory[VR Battle Beacons]", to_number(inventory["Powerup BB_BATTLE"]));
+                setFormValue("inventory[Other Beacons]", to_number(getOtherBeacons(inventory)));
+                setFormValue("inventory[VRHS]", to_number(inventory["HS VERY_RARE"]));
+                setFormValue("inventory[VRMH]", to_number(inventory["Multi-Hack VERY_RARE"]));
+                setFormValue("inventory[SBUL]", to_number(inventory["Ultra-Link"]));
+                setFormValue("inventory[FRK]", to_number(inventory["Powerup FRACK"]));
+                setFormValue("inventory[Caps]", to_number(inventory["Capsule"]));
                 var utc = new Date().toJSON();
                 var commentElement = document.getElementsByName("inventory[_notes]")[0];
                 if (!commentElement.value.includes("Inventory automatically filled with Guschtels Inventory userscripts")) {
