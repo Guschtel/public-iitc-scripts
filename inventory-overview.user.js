@@ -607,13 +607,14 @@ function wrapper(plugin_info) {
  
  	function loadInventory() {
  		try {
- 			const localData = JSON.parse(localStorage[KEY_SETTINGS]);
- 			if (localData && localData.expires > Date.now()) {
- 				prepareData(localData.data);
- 				return;
- 			} else {
-				prepareData(null);
+			if (localStorage[KEY_SETTINGS]) {
+				const localData = JSON.parse(localStorage[KEY_SETTINGS]);
+				if (localData && localData.expires > Date.now()) {
+					prepareData(localData.data);
+					return;
+				}
 			}
+			prepareData(null);
  		} catch (e) {
 			console.error("Error loading inventory: ", e);
 		}
