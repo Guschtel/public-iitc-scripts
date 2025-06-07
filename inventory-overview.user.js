@@ -3,7 +3,7 @@
 // @name           Ingress Inventory Overview (based on Ingress Live Inventory from Freamstern)
 // @author         Guschtel
 // @category       Utilities
-// @version        0.0.9
+// @version        0.0.10
 // @downloadURL    https://raw.githubusercontent.com/Guschtel/public-iitc-scripts/main/inventory-overview.user.js
 // @updateURL      https://raw.githubusercontent.com/Guschtel/public-iitc-scripts/main/inventory-overview.user.js
 // @description    View inventory and shows portals you have keys from
@@ -264,11 +264,160 @@ function wrapper(plugin_info) {
  </tr>`;
  		}).join('');
  	}
- 
- 	function updateKeyTableBody(orderBy, direction) {
- 		$('#live-inventory-key-table tbody').empty().append($(getKeyTableBody(orderBy, direction)))
+
+
+	function getHistoryTableBody(orderBy, direction) {
+		const sortFunctions = {
+			date: (a, b) => {
+				if (a.date === b.date) {
+					return 0;
+				}
+				return (a.date.toLowerCase() > b.date.toLowerCase() ? 1 : -1) * (direction ? 1 : -1);
+			}
+		};
+
+		const history = localStorage[KEY_SETTINGS] ? JSON.parse(localStorage[KEY_SETTINGS]).history : [];
+		history.sort(sortFunctions[orderBy]);
+		return history.map((el, index) => {
+			return `<tr>
+ <td>${el.date}</td>
+ <td>
+ 	<a onclick="window.plugin.LiveInventory.deleteHistoryItem('${el.date}')">Delete</a>` +
+				((index !== 0) ? ` / <a onclick="window.plugin.LiveInventory.showHistoryDiff('${el.date}')">Diff</a>` : '') +
+ `</td>
+ </tr>`;
+		}).join('');
+	}
+
+ 	function updateTableBody(key, orderBy, direction) {
+		 switch (key) {
+			 case 'key':
+				 $('#live-inventory-key-table tbody').empty().append($(getKeyTableBody(orderBy, direction)));
+			 break;
+			 case 'item':
+				 $('#live-inventory-item-table tbody').empty().append($(getItemTableBody(orderBy, direction)));
+				 break;
+			 case 'history':
+				 $('#live-inventory-history-table tbody').empty().append($(getHistoryTableBody(orderBy, direction)));
+				 break;
+		 }
+
  	}
- 
+
+	window.plugin.LiveInventory.deleteHistoryItem = function(date) {
+		const history = JSON.parse(localStorage[KEY_SETTINGS]).history;
+		patchLocalStorage({
+			history: history.filter(e => e.date !== date),
+		});
+		updateHistoryTable();
+	}
+
+	window.plugin.LiveInventory.showHistoryDiff = function(date) {
+		const history = JSON.parse(localStorage[KEY_SETTINGS]).history;
+		const index = history.findIndex((a) => a.date === date)
+		if (index === -1) {
+			window.alert('No history found for this date');
+			return;
+		}
+		const prev = history[index - 1];
+		if (!prev) {
+			window.alert('No previous history found for this date');
+			return;
+		}
+		const current = history[index];
+
+		const prevMap = prev.entries.reduce((acc, item) => {
+			acc[item.type] = item;
+			return acc;
+		}, {});
+
+		const currentMap = current.entries.reduce((acc, item) => {
+			acc[item.type] = item;
+			return acc;
+		}, {});
+
+		const types = [...new Set([...Object.keys(prevMap), ...Object.keys(currentMap)])];
+
+		const diff = types.map((type) => {
+			const prevValue = prevMap[type]?.count || 0;
+			const currentValue = currentMap[type]?.count || 0;
+			return {
+				type: type,
+				rarity: currentMap[type]?.rarity || prevMap[type]?.rarity,
+				diffCount: currentValue - prevValue,
+				prevCount: prevValue,
+				currentCount: currentValue
+			}
+		}).filter(item => item.diffCount !== 0);
+
+		const diffCsv = "Type;Rarity;Diff;Previous Count;Current Count\n" + diff.map((item) => {
+			return `${item.type};${item.rarity};${item.diffCount};${item.prevCount};${item.currentCount}`
+			}
+		)
+
+		dialog({
+			html: `<div id="live-inventory-diff">
+		<div class="tab">
+			<button class="tablinks active">Diff</button>
+		</div>
+		<div id="tab-diff" class="tabcontent tab-init-open"><table id="live-inventory-item-table">
+            <thead>
+                <tr>
+                    <th class="" data-orderby="type">Type</th>
+                    <th class="" data-orderby="rarity">Rarity</th>
+                    <th class="" data-orderby="diff">Diff</th>
+                    <th class="" data-orderby="currentCount">Current Count</th>
+                    <th class="" data-orderby="prevCount">Previous Count</th>
+                </tr>
+            </thead>
+        <tbody>
+        ${getDiffTableBody('type', 1, diff)}
+        </tbody>
+        </table></div></div>`,
+			title: 'Live Inventory Diff between ' + date + ' and ' + prev.date,
+			id: 'live-inventory-diff',
+			width: 'auto'
+		}).dialog('option', 'buttons', {
+			'Copy to clipboard': function () {
+				navigator.clipboard.writeText(diffCsv);
+			},
+			'OK': function () {
+				$(this).dialog('close');
+			},
+		});
+	}
+
+	function getDiffTableBody(orderBy, direction, diff) {
+		const sortFunctions = {
+			type: (a, b) => {
+				if (a.type === b.type) {
+					return 0;
+				}
+				return (a.type.toLowerCase() > b.type.toLowerCase() ? 1 : -1) * (direction ? 1 : -1);
+			},
+			rarity: (a, b) => {
+				if (a.rarity === b.rarity) {
+					return 0;
+				}
+				return (a.rarity.toLowerCase() > b.rarity.toLowerCase() ? 1 : -1) * (direction ? 1 : -1);
+			},
+			diffCount: (a, b) => (a.diffCount - b.diffCount) * (direction ? 1 : -1),
+			prevCount: (a, b) => (a.prevCount - b.prevCount) * (direction ? 1 : -1),
+			currentCount: (a, b) => (a.currentCount - b.currentCount) * (direction ? 1 : -1),
+		};
+
+
+		diff.sort(sortFunctions[orderBy]);
+		return diff.map((el) => {
+			return `<tr>
+ <td>${el.type}</td>
+ <td>${el.rarity || ''}</td>
+ <td>${el.diffCount}</td>
+ <td>${el.prevCount}</td>
+ <td>${el.currentCount}</td>
+ </tr>`;
+		}).join('');
+	}
  
  	function getItemTableBody(orderBy, direction) {
  		const sortFunctions = {
@@ -301,7 +450,39 @@ function wrapper(plugin_info) {
  	function updateItemTableBody(orderBy, direction) {
  		$('#live-inventory-item-table tbody').empty().append($(getItemTableBody(orderBy, direction)))
  	}
- 
+
+	 function onCopyItems() {
+		 exportItems();
+		 writeLocalStorageItemHistory();
+		 updateHistoryTable()
+	 }
+
+	 function updateHistoryTable() {
+		 updateTableBody('history', 'date', 1);
+	 }
+
+	function writeLocalStorageItemHistory() {
+		const entries = thisPlugin.itemCount.map((i) => {
+			return {
+				type: i.type,
+				rarity: i.resourceRarity,
+				count: i.count
+			};
+		});
+		// if (entries.length === 0) {
+		// 	console.log('No items to write to history');
+		// 	return;
+		// }
+		const entry = {
+			date: new Date().toISOString(),
+			entries: entries
+		}
+		const localstorage = JSON.parse(localStorage[KEY_SETTINGS]);
+		const history = localstorage.history || [];
+		history.push(entry);
+		patchLocalStorage({history: history})
+	}
+
  	function exportItems() {
  		const str = ['Type\tRarity\tCount', ...thisPlugin.itemCount.map((i) => [i.type, i.resourceRarity, i.count].join('\t'))].join('\n');
  		navigator.clipboard.writeText(str);
@@ -480,6 +661,7 @@ function wrapper(plugin_info) {
     <button class="tablinks" onclick="openTab(event, 'tab-mods')">Mods</button>
     <button class="tablinks" onclick="openTab(event, 'tab-complete')">Item overview</button>
     <button class="tablinks" onclick="openTab(event, 'tab-keys')">Keys</button>
+    <button class="tablinks" onclick="openTab(event, 'tab-history')">History</button>
     </div>
 
     <!-- Tab content -->
@@ -537,12 +719,27 @@ function wrapper(plugin_info) {
         </tbody>
         </table>
     </div>
+    <div id="tab-history" class="tabcontent">
+    	<p>
+    	&#x1F6C8; Click on "Copy Items" to create a history entry for the current inventory.</p>
+        <table id="live-inventory-history-table">
+        <thead>
+            <tr>
+                <th class="" data-orderby="date">Date</th>
+                <th class="">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        ${getHistoryTableBody('date', 1)}
+        </tbody>
+        </table>
+    </div>
 </div>`,
  			title: 'Live Inventory',
  			id: 'live-inventory',
  			width: 'auto'
  		}).dialog('option', 'buttons', {
- 			'Copy Items': exportItems,
+ 			'Copy Items': onCopyItems,
  			'Copy Keys': exportKeys,
  			'OK': function () {
  				$(this).dialog('close');
@@ -550,19 +747,17 @@ function wrapper(plugin_info) {
  		});
         
         initInventoryChart();
- 
- 		$('#live-inventory-key-table th').click(function () {
- 			const orderBy = this.getAttribute('data-orderby');
- 			this.orderDirection = !this.orderDirection;
- 			updateKeyTableBody(orderBy, this.orderDirection);
- 		});
- 
- 		$('#live-inventory-item-table th').click(function () {
- 			const orderBy = this.getAttribute('data-orderby');
- 			this.orderDirection = !this.orderDirection;
- 			updateItemTableBody(orderBy, this.orderDirection);
- 		});
- 
+
+		const tabs = ['key', 'item', 'history'];
+		for (var i = 0; i < tabs.length; i++) {
+			const tab = tabs[i];
+			const selector = '#live-inventory-' + tab + '-table th';
+			$(selector).click(function () {
+				const orderBy = this.getAttribute('data-orderby');
+				this.orderDirection = !this.orderDirection;
+				updateTableBody(tab, orderBy, this.orderDirection);
+			});
+		}
  	};
  
  	function preparePortalKeyMap() {
@@ -604,7 +799,26 @@ function wrapper(plugin_info) {
  		thisPlugin.keyMap = preparePortalKeyMap();
  		updateDistances();
  	}
- 
+
+	function initLocalStorage() {
+		if (!localStorage[KEY_SETTINGS]) {
+			localStorage[KEY_SETTINGS] = JSON.stringify({
+				expires: undefined,
+				data: {},
+				history: [],
+			});
+		}
+	}
+
+	function patchLocalStorage(data) {
+		 const localData = JSON.parse(localStorage[KEY_SETTINGS]);
+		 const patched = {
+			 ...localData,
+			 ...data,
+		 };
+		 localStorage[KEY_SETTINGS] = JSON.stringify(patched);
+	}
+
  	function loadInventory() {
  		try {
 			if (localStorage[KEY_SETTINGS]) {
@@ -624,7 +838,7 @@ function wrapper(plugin_info) {
  				window.postAjax('getInventory', {
  					"lastQueryTimestamp": 0
  				}, (data, textStatus, jqXHR) => {
- 					localStorage[KEY_SETTINGS] = JSON.stringify({
+ 					patchLocalStorage({
  						data: data,
  						expires: Date.now() + 5 * 60 * 1000 // request data only once per five minutes, or we might hit a rate limit
  					});
@@ -690,6 +904,7 @@ function wrapper(plugin_info) {
  	}
  
  	function setup() {
+		initLocalStorage();
  		loadInventory();
  		$('<a href="#">')
  			.text('Inventory')
@@ -707,7 +922,7 @@ function wrapper(plugin_info) {
  pointer-events: none;
  -webkit-text-size-adjust:none;
  }
- #live-inventory th {
+ #live-inventory-diff th, #live-inventory th {
  background-color: rgb(27, 65, 94);
  cursor: pointer;
  }
