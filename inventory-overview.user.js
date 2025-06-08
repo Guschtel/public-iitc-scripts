@@ -366,7 +366,7 @@ function wrapper(plugin_info) {
 		const diffCsv = "Type;Rarity;Diff;Previous Count;Current Count\n" + diff.map((item) => {
 			return `${item.type};${item.rarity};${item.diffCount};${item.prevCount};${item.currentCount}`
 			}
-		)
+		).join("\n")
 
 		dialog({
 			html: `<div id="live-inventory-diff">
