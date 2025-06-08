@@ -4,6 +4,7 @@
 // @description  Update inventory script
 // @author       Guschtel
 // @namespace    http://tampermonkey.net/
+// @category     Utilities
 // @version      0.8
 // @match        https://*.willbe.blue/inventory/update
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=willbe.blue
@@ -45,15 +46,63 @@ function setFormValue(formKey, formValue) {
     copyCPbtn.className = "btn btn-primary";
     copyCPbtn.style = "margin-left: 1em;";
     copyCPbtn.onclick = function () {
-        function getClipboardContent() {
-            return navigator.permissions.query({name: "clipboard-read"}).then((result) => {
-                if (result.state === "granted" || result.state === "prompt") {
-                    return navigator.clipboard.readText();
-                } else {
-                    return Promise.reject(new Error("Clipboard permission not granted"));
-                }
-            });
+        function getClipboardContentFromDialog() {
+            return new Promise((resolve, reject) => {
+                const dialog = document.createElement('dialog');
+                const description = document.createElement('p');
+                const textarea = document.createElement('textarea');
+                const okButton = document.createElement('button');
+                const cancelButton = document.createElement('button');
 
+                dialog.style.padding = '1em';
+                description.textContent = 'The clipboard could not be accessed in your browser. Please paste your inventory into the textarea below.';
+                textarea.style.width = '400px';
+                textarea.style.height = '200px';
+                textarea.style.marginBottom = '1em';
+                okButton.textContent = 'OK';
+                cancelButton.textContent = 'Cancel';
+                okButton.style.marginRight = '1em';
+
+                dialog.appendChild(description);
+                dialog.appendChild(textarea);
+                dialog.appendChild(document.createElement('br'));
+                dialog.appendChild(okButton);
+                dialog.appendChild(cancelButton);
+
+                okButton.onclick = () => {
+                    dialog.close();
+                    resolve(textarea.value);
+                };
+                cancelButton.onclick = () => {
+                    dialog.close();
+                    reject(new Error('Dialog for inserting clipboard content cancelled'));
+                };
+
+                document.body.appendChild(dialog);
+                dialog.showModal();
+            });
+        }
+
+        function getClipboardContent() {
+            try {
+                return navigator.permissions.query({name: "clipboard-read"}).then(
+                    (result) => {
+                        if (result.state === "granted" || result.state === "prompt") {
+                            return navigator.clipboard.readText();
+                        } else {
+                            return Promise.reject(new Error("Clipboard permission not granted"));
+                        }
+                    },
+                    (error) => {
+                        if (error.message.includes("clipboard-read")) {
+                            return getClipboardContentFromDialog();
+                        }
+                        throw error;
+                    }
+                );
+            } catch (e) {
+                return getClipboardContentFromDialog();
+            }
         }
 
         getClipboardContent()
