@@ -3,7 +3,7 @@
 // @name           Ingress Inventory Overview (based on Ingress Live Inventory from Freamstern)
 // @author         Guschtel
 // @category       Utilities
-// @version        0.0.10
+// @version        0.0.11
 // @downloadURL    https://raw.githubusercontent.com/Guschtel/public-iitc-scripts/main/inventory-overview.user.js
 // @updateURL      https://raw.githubusercontent.com/Guschtel/public-iitc-scripts/main/inventory-overview.user.js
 // @description    View inventory and shows portals you have keys from
@@ -70,7 +70,16 @@ function wrapper(plugin_info) {
  		ULTRA_STRIKE: 'US',
  
  	};
- 
+
+	 function writeTextToClipboard(text) {
+		 navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
+			 if (result.state === "granted" || result.state === "prompt") {
+				 navigator.clipboard.writeText(text);
+				 console.log('Text copied to clipboard');
+			 }
+		 });
+	 }
+
  	function checkSubscription(callback) {
  		var versionStr = niantic_params.CURRENT_VERSION;
  		var post_data = JSON.stringify({
@@ -392,7 +401,7 @@ function wrapper(plugin_info) {
 			width: 'auto'
 		}).dialog('option', 'buttons', {
 			'Copy to clipboard': function () {
-				navigator.clipboard.writeText(diffCsv);
+				writeTextToClipboard(diffCsv);
 			},
 			'OK': function () {
 				$(this).dialog('close');
@@ -501,12 +510,12 @@ function wrapper(plugin_info) {
 
  	function exportItems() {
  		const str = ['Type\tRarity\tCount', ...thisPlugin.itemCount.map((i) => [i.type, i.resourceRarity, i.count].join('\t'))].join('\n');
- 		navigator.clipboard.writeText(str);
+		writeTextToClipboard(str);
  	}
  
  	function exportKeys() {
  		const str = ['Name\tLink\tGUID\tKeys', ...thisPlugin.keyCount.map((el) => [el.portalCoupler.portalTitle, `https://intel.ingress.com/?pll=${el._latlng.lat},${el._latlng.lng}`, el.portalCoupler.portalGuid, el.count].join('\t'))].join('\n');
- 		navigator.clipboard.writeText(str);
+		writeTextToClipboard(str);
  	}
  
     function getItemImage(resourceRarity, type) {
