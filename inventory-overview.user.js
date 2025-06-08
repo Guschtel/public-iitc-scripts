@@ -3,7 +3,7 @@
 // @name           Ingress Inventory Overview (based on Ingress Live Inventory from Freamstern)
 // @author         Guschtel
 // @category       Utilities
-// @version        0.0.11
+// @version        0.0.12
 // @downloadURL    https://raw.githubusercontent.com/Guschtel/public-iitc-scripts/main/inventory-overview.user.js
 // @updateURL      https://raw.githubusercontent.com/Guschtel/public-iitc-scripts/main/inventory-overview.user.js
 // @description    View inventory and shows portals you have keys from
@@ -81,9 +81,37 @@ function wrapper(plugin_info) {
         return (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
     }
 
+    function isFirefox() {
+        return (/Firefox/i.test(navigator.userAgent));
+    }
+
+    function copyToClipboardFallbackExecCommand(text) {
+        // Optionaler Fallback mit document.execCommand
+        try {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";  // Vermeidet Scrollen
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            if (successful) {
+                console.log('Fallback: Text erfolgreich kopiert');
+            }
+        } catch (fallbackErr) {
+            console.error('Fallback fehlgeschlagen:', fallbackErr);
+        }
+
+    }
+
     function writeTextToClipboard(text) {
-        if (isiOS()) {
-            navigator.clipboard.writeText(text);
+        if (isiOS() || isFirefox()) {
+            try {
+                navigator.clipboard.writeText(text);
+            } catch (err) {
+                copyToClipboardFallbackExecCommand(text);
+            }
             return;
         }
         navigator.permissions.query({name: "clipboard-write"}).then((result) => {
