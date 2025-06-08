@@ -276,8 +276,16 @@ function wrapper(plugin_info) {
 			}
 		};
 
-		const history = localStorage[KEY_SETTINGS] ? JSON.parse(localStorage[KEY_SETTINGS]).history : [];
-		history.sort(sortFunctions[orderBy]);
+		let history;
+		if (localStorage[KEY_SETTINGS]) {
+			const data = JSON.parse(localStorage[KEY_SETTINGS]);
+			history = data.history;
+		}
+		if (!history) {
+			history = [];
+		} else {
+			history.sort(sortFunctions[orderBy]);
+		}
 		return history.map((el, index) => {
 			return `<tr>
  <td>${el.date}</td>
@@ -313,7 +321,12 @@ function wrapper(plugin_info) {
 	}
 
 	window.plugin.LiveInventory.showHistoryDiff = function(date) {
-		const history = JSON.parse(localStorage[KEY_SETTINGS]).history;
+		const data = JSON.parse(localStorage[KEY_SETTINGS]);
+		if (!data || !data.history) {
+			window.alert('No date given for diff.');
+			return;
+		}
+		const history = data.history;
 		const index = history.findIndex((a) => a.date === date)
 		if (index === -1) {
 			window.alert('No history found for this date');
@@ -388,6 +401,9 @@ function wrapper(plugin_info) {
 	}
 
 	function getDiffTableBody(orderBy, direction, diff) {
+		if (!diff) {
+			return "";
+		}
 		const sortFunctions = {
 			type: (a, b) => {
 				if (a.type === b.type) {
