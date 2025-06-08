@@ -3,7 +3,7 @@
 // @name           Ingress Inventory Overview (based on Ingress Live Inventory from Freamstern)
 // @author         Guschtel
 // @category       Utilities
-// @version        0.0.8
+// @version        0.0.9
 // @downloadURL    https://raw.githubusercontent.com/Guschtel/public-iitc-scripts/main/inventory-overview.user.js
 // @updateURL      https://raw.githubusercontent.com/Guschtel/public-iitc-scripts/main/inventory-overview.user.js
 // @description    View inventory and shows portals you have keys from
@@ -27,7 +27,7 @@ function wrapper(plugin_info) {
  	plugin_info.buildName = "LiveInventory";
  
  	// Datetime-derived version of the plugin
- 	plugin_info.dateTimeVersion = "202102100950";
+ 	plugin_info.dateTimeVersion = "20250331202900";
  
  	// ID/name of the plugin
  	plugin_info.pluginId = "liveInventory";
@@ -607,12 +607,17 @@ function wrapper(plugin_info) {
  
  	function loadInventory() {
  		try {
- 			const localData = JSON.parse(localStorage[KEY_SETTINGS]);
- 			if (localData && localData.expires > Date.now()) {
- 				prepareData(localData.data);
- 				return;
- 			}
- 		} catch (e) {}
+			if (localStorage[KEY_SETTINGS]) {
+				const localData = JSON.parse(localStorage[KEY_SETTINGS]);
+				if (localData && localData.expires > Date.now()) {
+					prepareData(localData.data);
+					return;
+				}
+			}
+			prepareData(null);
+ 		} catch (e) {
+			console.error("Error loading inventory: ", e);
+		}
  
  		checkSubscription((err, data) => {
  			if (data && data.result === true) {
