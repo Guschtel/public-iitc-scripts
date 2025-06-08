@@ -4,7 +4,7 @@
 // @description  Update inventory script
 // @author       Guschtel
 // @namespace    http://tampermonkey.net/
-// @version      0.7
+// @version      0.8
 // @match        https://*.willbe.blue/inventory/update
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=willbe.blue
 // @grant        none
@@ -45,7 +45,18 @@ function setFormValue(formKey, formValue) {
     copyCPbtn.className = "btn btn-primary";
     copyCPbtn.style = "margin-left: 1em;";
     copyCPbtn.onclick = function () {
-        navigator.clipboard.readText()
+        function getClipboardContent() {
+            return navigator.permissions.query({name: "clipboard-read"}).then((result) => {
+                if (result.state === "granted" || result.state === "prompt") {
+                    return navigator.clipboard.readText();
+                } else {
+                    return Promise.reject(new Error("Clipboard permission not granted"));
+                }
+            });
+
+        }
+
+        getClipboardContent()
             .then(text => {
             console.log('Pasted content: ', text);
             if (text.includes('Type	Rarity	Count')) {
