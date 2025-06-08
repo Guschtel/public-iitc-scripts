@@ -485,10 +485,10 @@ function wrapper(plugin_info) {
 				count: i.count
 			};
 		});
-		// if (entries.length === 0) {
-		// 	console.log('No items to write to history');
-		// 	return;
-		// }
+		if (entries.length === 0) {
+			console.log('No items to write to history');
+			return;
+		}
 		const entry = {
 			date: new Date().toISOString(),
 			entries: entries
@@ -736,8 +736,8 @@ function wrapper(plugin_info) {
         </table>
     </div>
     <div id="tab-history" class="tabcontent">
-    	<p>
-    	&#x1F6C8; Click on "Copy Items" to create a history entry for the current inventory.</p>
+    	<p>&#x1F6C8; Click on "Copy Items" to create a history entry for the current inventory.</p>
+    	<p>Make sure, that your inventory data was correctly updated before. You might need to reload IITC to refetch your inventory.</p>
         <table id="live-inventory-history-table">
         <thead>
             <tr>

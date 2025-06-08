@@ -74,3 +74,24 @@ XMP 8	COMMON	9999
 On Anomalyhub, if you visit the /inventory/update link a new button should appear: "Copy from clipboard", use it to fill the inventory fields, then click "Update" to submit the data.
 
 ![Update Inventory View](https://raw.githubusercontent.com/Guschtel/public-iitc-scripts/main/images/inventory-anomalyhub-updater/athens-anomaly-update.png)
+
+### Inventory History Snapshots
+
+If you want to compare two inventory states, there is now a History Snapshot functionality.
+Every time you click on "Copy Items" a new history entry is created and shown in the history tab.
+
+![Diff List View](https://github.com/Guschtel/public-iitc-scripts/blob/main/images/inventory-overview/diff_0.png?raw=true)
+
+From there, you can:
+- delete a history item (that deletes the data from your localstorage)
+- show a diff to the previous entry
+
+![Diff Detail View](https://github.com/Guschtel/public-iitc-scripts/blob/main/images/inventory-overview/diff_1_desktop.png?raw=true)
+
+The diff will show the difference of the two inventory snapshots and can be exported as CSV to the clipboard.
+
+This also works on IITC mobile:
+
+![Diff on Mobile](https://github.com/Guschtel/public-iitc-scripts/blob/main/images/inventory-overview/diff_1_mobile.png?raw=true)
+
+It might be necessary to reload IITC before copying the new inventory if you are testing it, since the inventory data is cached for a certain amount of time.
