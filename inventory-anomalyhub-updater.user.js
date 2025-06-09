@@ -46,6 +46,14 @@ function setFormValue(formKey, formValue) {
     copyCPbtn.className = "btn btn-primary";
     copyCPbtn.style = "margin-left: 1em;";
     copyCPbtn.onclick = function () {
+        function isiOS() {
+            return (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream);
+        }
+
+        function isFirefox() {
+            return (/Firefox/i.test(navigator.userAgent));
+        }
+
         function getClipboardContentFromDialog() {
             return new Promise((resolve, reject) => {
                 const dialog = document.createElement('dialog');
@@ -85,12 +93,15 @@ function setFormValue(formKey, formValue) {
 
         function getClipboardContent() {
             try {
+                if (isiOS() || isFirefox()) {
+                    return navigator.clipboard.readText();
+                }
                 return navigator.permissions.query({name: "clipboard-read"}).then(
                     (result) => {
                         if (result.state === "granted" || result.state === "prompt") {
                             return navigator.clipboard.readText();
                         } else {
-                            return Promise.reject(new Error("Clipboard permission not granted"));
+                            return getClipboardContentFromDialog();
                         }
                     },
                     (error) => {
