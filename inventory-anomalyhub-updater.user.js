@@ -5,7 +5,7 @@
 // @author       Guschtel
 // @namespace    http://tampermonkey.net/
 // @category     Utilities
-// @version      0.8
+// @version      0.9
 // @match        https://*.willbe.blue/inventory/update
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=willbe.blue
 // @grant        none
