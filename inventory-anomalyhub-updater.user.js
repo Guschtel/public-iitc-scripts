@@ -199,35 +199,27 @@
         }
     }
 
-    copyCPbtn.onclick = function () {
-        console.log('Copy button clicked');
-        if (isiOS()) {
-            console.log('iOs detected');
-            try {
-                getClipboardContentForIOs().then(text => {
+    if (isiOS()) {
+        console.log('iOs detected');
+        copyCPbtn.onclick = getClipboardContentForIOs().then(text => {
                     console.log('Read clipboard content for iOs: ', text);
                     parseClipboardContent(text);
-                })
-            } catch (e) {
-                console.error('Failed to read iOs clipboard contents: ', e);
-                getClipboardContentFromDialog().then(text => {
-                    console.error('Failed to read iOs clipboard contents: ', e);
-                    parseClipboardContent(text)
-                })
-            }
-            return;
-        }
+                });
+    } else {
         console.log('Proceeding with non-iOs');
-        getClipboardContentForNonIOs()
-            .then(text => {
-                console.log('Read clipboard content for non-iOs Browsers: ', text);
-                parseClipboardContent(text);
-            })
-            .catch(err => {
-            console.error('Failed to read clipboard contents: ', err);
-        });
-        return false;
-    };
+        copyCPbtn.onclick = function () {
+            console.log('Copy button clicked');
+            getClipboardContentForNonIOs()
+                .then(text => {
+                    console.log('Read clipboard content for non-iOs Browsers: ', text);
+                    parseClipboardContent(text);
+                })
+                .catch(err => {
+                    console.error('Failed to read clipboard contents: ', err);
+                });
+            return false;
+        }
+    }
 
     console.log('After buttons setup');
 
