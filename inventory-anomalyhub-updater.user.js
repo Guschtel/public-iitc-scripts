@@ -203,9 +203,10 @@
         console.log('iOs detected');
         copyCPbtn.onclick = async (event)=> {
             event.preventDefault();
-            const text = await getClipboardContentForIOs()
-            console.log('Read clipboard content for iOs Browsers: ', text);
-            parseClipboardContent(text);
+            getClipboardContentForIOs().then(text => {
+                console.log('Read clipboard content for iOs Browsers: ', text);
+                parseClipboardContent(text);
+            })
         }
     } else {
         console.log('Proceeding with non-iOs');
