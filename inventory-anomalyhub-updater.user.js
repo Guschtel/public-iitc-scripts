@@ -98,14 +98,14 @@
         });
     }
 
-    async function getClipboardContentForIOs() {
+    function getClipboardContentForIOs() {
             console.log("iOs: Read clipboard start");
             if (!navigator.clipboard?.readText) {
                 console.log("iOs: Read clipboard content from dialog bc navigator.clipboard.readText is not available");
                 return getClipboardContentFromDialog();
             }
             console.log("iOs: Read clipboard normally");
-            return await navigator.clipboard.readText();
+            return navigator.clipboard.readText();
     }
 
     function getClipboardContentForNonIOs() {
