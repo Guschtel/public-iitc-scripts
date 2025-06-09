@@ -15,7 +15,7 @@
     'use strict';
 
     // Your code here...
-    console.log('Running script! -------------------------------------');
+    console.log('Running Anomaly Update Ingress Inventory script! -------------------------------------');
 
     function to_number(val) {
         if (val === null || val === undefined) {
@@ -51,14 +51,11 @@
 
     function getClipboardContentFromDialog() {
         return new Promise((resolve, reject) => {
-            console.log("Read clipboard from Dialog start");
             const dialog = document.createElement('dialog');
             const description = document.createElement('p');
             const textarea = document.createElement('textarea');
             const okButton = document.createElement('button');
             const cancelButton = document.createElement('button');
-
-            console.log("Elements created");
 
             dialog.style.padding = '1em';
             description.textContent = 'The clipboard could not be accessed in your browser. Please paste your inventory into the textarea below.';
@@ -69,15 +66,11 @@
             cancelButton.textContent = 'Cancel';
             okButton.style.marginRight = '1em';
 
-            console.log("Styles set");
-
             dialog.appendChild(description);
             dialog.appendChild(textarea);
             dialog.appendChild(document.createElement('br'));
             dialog.appendChild(okButton);
             dialog.appendChild(cancelButton);
-
-            console.log("Dialog elements added");
 
             okButton.onclick = () => {
                 dialog.close();
@@ -90,11 +83,7 @@
 
             document.body.appendChild(dialog);
 
-            console.log("Dialog added to body");
-
             dialog.showModal();
-
-            console.log("Dialog shown");
         });
     }
 
@@ -136,18 +125,11 @@
     }
 
     const updateBtn = document.getElementsByClassName("btn btn-primary")[0];
-
-    console.log('Update Button found');
-
     let copyCPbtn = document.createElement("button");
-
-    console.log('Copy Button created');
 
     copyCPbtn.innerHTML = "Copy from Clipboard";
     copyCPbtn.className = "btn btn-primary";
     copyCPbtn.style = "margin-left: 1em;";
-
-    console.log('Copy Button styles all set');
 
     function parseClipboardContent(text) {
         console.log('Pasted content: ', text);
@@ -203,9 +185,7 @@
         console.log('iOs detected');
         copyCPbtn.onclick = async (event)=> {
             event.preventDefault();
-            console.log('Copy button clicked, trying to open dialog for pasting clipboard content');
             getClipboardContentFromDialog().then(text => {
-                console.log('Read clipboard content for iOs Browsers: ', text);
                 parseClipboardContent(text);
             })
         }
@@ -213,10 +193,8 @@
         console.log('Proceeding with non-iOs');
         copyCPbtn.onclick = async (event)=> {
             event.preventDefault();
-            console.log('Copy button clicked');
             getClipboardContentForNonIOs()
                 .then(text => {
-                    console.log('Read clipboard content for non-iOs Browsers: ', text);
                     parseClipboardContent(text);
                 })
                 .catch(err => {
@@ -225,10 +203,5 @@
             return false;
         }
     }
-
-    console.log('After buttons setup');
-
     updateBtn.parentNode.insertBefore(copyCPbtn, updateBtn.nextSibling);
-
-    console.log('Insert Button successful');
 })();

@@ -97,10 +97,10 @@ function wrapper(plugin_info) {
             const successful = document.execCommand('copy');
             document.body.removeChild(textArea);
             if (successful) {
-                console.log('Fallback: Text erfolgreich kopiert');
+                console.log('Fallback: Text copied successfully');
             }
         } catch (fallbackErr) {
-            console.error('Fallback fehlgeschlagen:', fallbackErr);
+            console.error('Fallback failed:', fallbackErr);
         }
 
     }
