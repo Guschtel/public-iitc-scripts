@@ -201,7 +201,7 @@
 
     if (isiOS()) {
         console.log('iOs detected');
-        copyCPbtn.onclick = getClipboardContentForIOs().then(text => {
+        copyCPbtn.onclick = () => getClipboardContentForIOs().then(text => {
                     console.log('Read clipboard content for iOs: ', text);
                     parseClipboardContent(text);
                 });
