@@ -56,11 +56,14 @@ function setFormValue(formKey, formValue) {
 
         function getClipboardContentFromDialog() {
             return new Promise((resolve, reject) => {
+                console.log("Read clipboard from Dialog start");
                 const dialog = document.createElement('dialog');
                 const description = document.createElement('p');
                 const textarea = document.createElement('textarea');
                 const okButton = document.createElement('button');
                 const cancelButton = document.createElement('button');
+
+                console.log("Elements created");
 
                 dialog.style.padding = '1em';
                 description.textContent = 'The clipboard could not be accessed in your browser. Please paste your inventory into the textarea below.';
@@ -71,11 +74,15 @@ function setFormValue(formKey, formValue) {
                 cancelButton.textContent = 'Cancel';
                 okButton.style.marginRight = '1em';
 
+                console.log("Styles set");
+
                 dialog.appendChild(description);
                 dialog.appendChild(textarea);
                 dialog.appendChild(document.createElement('br'));
                 dialog.appendChild(okButton);
                 dialog.appendChild(cancelButton);
+
+                console.log("Dialog elements added");
 
                 okButton.onclick = () => {
                     dialog.close();
@@ -87,7 +94,12 @@ function setFormValue(formKey, formValue) {
                 };
 
                 document.body.appendChild(dialog);
+
+                console.log("Dialog added to body");
+
                 dialog.showModal();
+
+                console.log("Dialog shown");
             });
         }
 
@@ -97,29 +109,33 @@ function setFormValue(formKey, formValue) {
                     return navigator.clipboard.readText();
                 }
                 if (isiOS()) {
-                    return navigator.clipboard.readText().then(
-                        (result) => result,
-                        () => {
-                            return getClipboardContentFromDialog();
+                    console.log("iOs: Read clipboard attempt");
+                    if (!navigator.clipboard?.readText) {
+                        console.log("iOs: Read clipboard content from dialog bc navigator.clipboard.readText is not available");
+                        return getClipboardContentFromDialog();
+                    }
+                    console.log("iOs: Read clipboard normally");
+                    return navigator.clipboard.readText();
+                } else {
+                    // Chrome
+                    return navigator.permissions.query({name: "clipboard-read"}).then(
+                        (result) => {
+                            if (result.state === "granted" || result.state === "prompt") {
+                                return navigator.clipboard.readText();
+                            } else {
+                                return getClipboardContentFromDialog();
+                            }
+                        },
+                        (error) => {
+                            if (error.message.includes("clipboard-read")) {
+                                return getClipboardContentFromDialog();
+                            }
+                            throw error;
                         }
                     );
                 }
-                return navigator.permissions.query({name: "clipboard-read"}).then(
-                    (result) => {
-                        if (result.state === "granted" || result.state === "prompt") {
-                            return navigator.clipboard.readText();
-                        } else {
-                            return getClipboardContentFromDialog();
-                        }
-                    },
-                    (error) => {
-                        if (error.message.includes("clipboard-read")) {
-                            return getClipboardContentFromDialog();
-                        }
-                        throw error;
-                    }
-                );
             } catch (e) {
+                console.error('Failed to read clipboard contents in catch: ', e);
                 return getClipboardContentFromDialog();
             }
         }
