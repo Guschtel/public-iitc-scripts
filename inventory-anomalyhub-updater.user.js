@@ -203,7 +203,8 @@
         console.log('iOs detected');
         copyCPbtn.onclick = async (event)=> {
             event.preventDefault();
-            getClipboardContentForIOs().then(text => {
+            console.log('Copy button clicked, trying to open dialog for pasting clipboard content');
+            getClipboardContentFromDialog().then(text => {
                 console.log('Read clipboard content for iOs Browsers: ', text);
                 parseClipboardContent(text);
             })
