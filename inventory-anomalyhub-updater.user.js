@@ -201,13 +201,16 @@
 
     if (isiOS()) {
         console.log('iOs detected');
-        copyCPbtn.onclick = () => getClipboardContentForIOs().then(text => {
-                    console.log('Read clipboard content for iOs: ', text);
-                    parseClipboardContent(text);
-                });
+        copyCPbtn.onclick = async (event)=> {
+            event.preventDefault();
+            const text = await getClipboardContentForIOs()
+            console.log('Read clipboard content for iOs Browsers: ', text);
+            parseClipboardContent(text);
+        }
     } else {
         console.log('Proceeding with non-iOs');
-        copyCPbtn.onclick = function () {
+        copyCPbtn.onclick = async (event)=> {
+            event.preventDefault();
             console.log('Copy button clicked');
             getClipboardContentForNonIOs()
                 .then(text => {
