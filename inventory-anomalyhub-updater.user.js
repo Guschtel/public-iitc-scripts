@@ -93,8 +93,16 @@ function setFormValue(formKey, formValue) {
 
         function getClipboardContent() {
             try {
-                if (isiOS() || isFirefox()) {
+                if (isFirefox()) {
                     return navigator.clipboard.readText();
+                }
+                if (isiOS()) {
+                    return navigator.clipboard.readText().then(
+                        (result) => result,
+                        () => {
+                            return getClipboardContentFromDialog();
+                        }
+                    );
                 }
                 return navigator.permissions.query({name: "clipboard-read"}).then(
                     (result) => {
