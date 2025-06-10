@@ -430,8 +430,8 @@ function wrapper(plugin_info) {
                     <th class="" data-orderby="type">Type</th>
                     <th class="" data-orderby="rarity">Rarity</th>
                     <th class="" data-orderby="diff">Diff</th>
-                    <th class="" data-orderby="currentCount">Current Count</th>
                     <th class="" data-orderby="prevCount">Previous Count</th>
+                    <th class="" data-orderby="currentCount">Current Count</th>
                 </tr>
             </thead>
         <tbody>
